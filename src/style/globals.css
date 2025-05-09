@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+    --breakpoint-xs: 375px;
+    --xs: 375px;
+    --breakpoint-sm: 575px;
+    --sm: 575px;
+    --breakpoint-md: 768px;
+    --md: 768px;
+    --breakpoint-lg: 992px;
+    --lg: 992px;
+    --breakpoint-xl: 1200px;
+    --xl: 1200px;
+    --breakpoint-xxl: 1600px;
+    --xxl: 1600px;
+    /* widht */
+    --vw-12: calc(100vw - 3rem);
+    --vw-40: calc(100vw - 10rem);
+    /* height */
+    --vh-12: calc(100vh - 3rem)
+}

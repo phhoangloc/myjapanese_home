@@ -1,0 +1,85 @@
+.dangerous_box {
+    h1 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 16px 0;
+        line-height: 1.25;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+        font-weight: 800;
+        margin-bottom: 4px;
+        margin-top: 12px;
+        line-height: 1.25;
+
+    }
+
+    h3 {
+        margin-top: 12px;
+        font-size: 1.175rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+
+    }
+
+    h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 4px 0;
+    }
+
+    h5 {
+        font-size: 0.875rem;
+        font-weight: 700;
+
+    }
+
+    i {
+        font-size: small;
+    }
+
+    p,
+    div,
+    li {
+        margin: 4px 0;
+        line-height: 1.35;
+    }
+
+    img {
+        width: 100%;
+    }
+
+    em {
+        opacity: 0.75;
+        display: block;
+        text-align: center;
+        font-size: 0.875rem;
+    }
+
+    ul {
+        padding-left: 20px;
+
+        li {
+            list-style: disc;
+        }
+    }
+
+    pre {
+        backdrop-filter: brightness(0.75);
+        padding: 12px;
+
+        pre {
+            padding: 0;
+
+            div {
+                margin: 0;
+            }
+        }
+    }
+
+}
+
+.scroll_none::-webkit-scrollbar {
+    display: none;
+}

@@ -1,103 +1,80 @@
-import Image from "next/image";
+'use client'
+import { ApiItem } from "@/api/client";
+import LoginCard from "@/components/card/loginCard";
+import Header from "@/components/layout/header";
+import { UserType } from "@/redux/reducer/UserReduce";
+import store from "@/redux/store";
+import { useEffect, useState } from "react";
+
+export type BlogType =
+  {
+    archive: string
+    censor: boolean
+    content: string,
+    createdAt: Date,
+    hostId: number,
+    host: { id: number, username: string },
+    id: number,
+    slug: string,
+    updateDate: string
+  }
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const [_currentUser, set_currentUser] = useState<UserType>(store.getState().user)
+
+  const update = () => {
+    store.subscribe(() => set_currentUser(store.getState().user))
+  }
+
+  useEffect(() => {
+    update()
+  }, [])
+
+  const [_blogs, set_blogs] = useState<BlogType[]>([])
+  const getBlog = async (archive: string) => {
+    const result = await ApiItem({ archive })
+    if (result.success) {
+      set_blogs(result.data)
+    } else {
+      set_blogs([])
+    }
+  }
+
+  useEffect(() => {
+    getBlog("blog")
+  }, [])
+
+  const [_read, set_read] = useState<boolean>(false)
+  const [_index, set_index] = useState<number>(-1)
+
+  return (
+    _currentUser.id ?
+      <div className="min-h-screen ">
+        <Header />
+        <div className="bg-slate-50">
+          <div className="w-11/12 max-w-(--md) m-auto min-h-screen">
+            <div className="h-12"></div>
+            <div className="text-2xl text-sky-600 font-bold h-12 flex flex-col justify-center">Blog</div>
+            {_blogs.length ?
+              _blogs.map((blog, index) =>
+                <div key={index} className=" shadow border border-slate-300 rounded mt-4">
+                  <div className="h-12 flex flex-col justify-center font-bold text-sky-600 border-b border-slate-300 px-2 bg-slate-50">{blog.host.username}</div>
+                  <div className={`${_read && index === _index ? "" : "line-clamp-6"} min-h-36 px-2 pt-2 md:px-4 md:pt-4 bg-white dangerous_box text-justify`} dangerouslySetInnerHTML={{ __html: blog.content }}></div>
+                  <div className="h-12 flex flex-col justify-center text-center text-sm cursor-pointer bg-white" onClick={() => { set_read(true); set_index(index) }}>read more</div>
+                  <div className="h-12 flex justify-between border-t border-slate-300">
+                    <div className="w-1/2 text-center flex flex-col justify-center cursor-pointer">like</div>
+                    <div className="bg-slate-300 w-[1px] h-1/2 my-auto"></div>
+                    <div className="w-1/2 text-center flex flex-col justify-center cursor-pointer">comment</div>
+                  </div>
+                </div>) :
+              <div>まだブログはありません</div>
+            }
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div> :
+      <div className="flex flex-col justify-center min-h-screen bg-slate-100">
+        <LoginCard />
+      </div>
   );
 }
