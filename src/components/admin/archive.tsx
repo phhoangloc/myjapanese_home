@@ -50,13 +50,13 @@ export const Archive = ({ archive }: props) => {
     const sx = `h-12 flex flex-col justify-center cursor-pointer px-2 transition-all duration-200 `
 
     return (
-        <div className='w-11/12 m-auto'>
+        <div className='w-full max-w-(--md)'>
             <div className='h-12 flex flex-col justify-center uppercase font-bold border-b text-sky-600 border-slate-300 '>{archive}</div>
             <div className="h12"></div>
-            <div className='h-12 flex'>
-                <AddIcon className='!w-12 !h-12 p-2 m-1 cursor-pointer border rounded border-slate-300' onClick={() => toPage.push("/admin/" + archive + "/_news")} />
-                <SearchIcon className='!w-12 !h-12 p-2 m-1 cursor-pointer border rounded border-slate-300' />
-                <SortByAlphaIcon className='!w-12 !h-12 p-2 m-1 cursor-pointer border rounded border-slate-300' />
+            <div className='h-12 flex gap-1'>
+                <AddIcon className='!w-12 !h-12 p-2 my-1 bg-white cursor-pointer border rounded border-slate-300' onClick={() => toPage.push("/admin/" + archive + "/_news")} />
+                <SearchIcon className='!w-12 !h-12 p-2 my-1 bg-white cursor-pointer border rounded border-slate-300' />
+                <SortByAlphaIcon className='!w-12 !h-12 p-2 my-1 bg-white cursor-pointer border rounded border-slate-300' />
             </div>
             <div className="border border-slate-300 rounded mt-4 shadow-md">
                 <div className='text-sm p-2 opacity-50 bg-white border-b border-slate-300 p'>

@@ -19,13 +19,13 @@ const Layout = ({ children }: Props) => {
     }, [])
 
     return (
-        <div className='w-full bg-bgr  flex flex-col'>
+        <div className='w-full flex flex-col'>
             <div className='flex w-max xl:w-full justify-between'>
                 <div className={`transition-all duration-200 sticky h-screen top-0 bg-white shadow-md ${_currentMenu ? "w-40" : "w-12"} lg:w-40`}>
                     <Sidebar />
                 </div>
 
-                <div className='w-(--vw-12) lg:w-(--vw-40)'>
+                <div className='w-(--vw-12) lg:w-(--vw-40) px-4'>
                     {children}
                 </div>
             </div>

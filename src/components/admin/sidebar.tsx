@@ -45,9 +45,7 @@ const Sidebar = () => {
     const [_currentUser, set_currentUser] = useState<UserType>(store.getState().user)
 
     const update = () => {
-        store.subscribe(() => {
-            set_currentUser(store.getState().user)
-        })
+        store.subscribe(() => set_currentUser(store.getState().user))
     }
     useEffect(() => {
         update()

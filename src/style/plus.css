@@ -1,13 +1,13 @@
 .dangerous_box h1 {
   font-size: 1.5rem;
-  font-weight: 800;
+  font-weight: bolder;
   margin: 16px 0;
   line-height: 1.25;
 }
 
 .dangerous_box h2 {
   font-size: 1.25rem;
-  font-weight: 800;
+  font-weight: bold;
   margin-bottom: 4px;
   margin-top: 12px;
   line-height: 1.25;
@@ -16,19 +16,19 @@
 .dangerous_box h3 {
   margin-top: 12px;
   font-size: 1.175rem;
-  font-weight: 700;
+  font-weight: bold;
   margin-bottom: 4px;
 }
 
 .dangerous_box h4 {
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: bold;
   margin: 4px 0;
 }
 
 .dangerous_box h5 {
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: bold;
 }
 
 .dangerous_box i {

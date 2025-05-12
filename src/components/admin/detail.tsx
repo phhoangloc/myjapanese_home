@@ -85,11 +85,11 @@ export const DetailBlog = ({ archive, slug }: props) => {
         }
     }
     return (
-        <div className='w-11/12 m-auto'>
+        <div className='w-full max-w-(--md)'>
             <div className='h-12 flex flex-col justify-center uppercase font-bold border-b text-sky-600 border-slate-300'>{archive}</div>
             <div className="h12"></div>
             <div className='h-12 flex'>
-                <AddIcon className='!w-12 !h-12 p-2 m-1 cursor-pointer border rounded border-slate-300 bg-white' onClick={() => toPage.push("blog/_news")} />
+                <AddIcon className='!w-12 !h-12 p-2 my-1 cursor-pointer border rounded border-slate-300 bg-white' onClick={() => toPage.push("blog/_news")} />
             </div>
             <div className='h-4'>
             </div>
@@ -103,7 +103,6 @@ export const DetailBlog = ({ archive, slug }: props) => {
                 <div className='flex flex-col justify-end text-sm'>
                     content
                 </div>
-
                 <TextArea value={_content} onchange={(v) => set_newContent(v)} />
             </div>
             <Button name={slug !== "_news" ? "save" : "create"} onClick={() => slug !== "_news" ? UpdateBlog(_currentUser.position, archive, _id, body) : CreateBlog(_currentUser.position, archive, body)} sx='block !mx-auto !my-4' />

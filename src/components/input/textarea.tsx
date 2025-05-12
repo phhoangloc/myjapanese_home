@@ -6,6 +6,9 @@ import React, { useEffect, useRef, useState } from 'react'
 import ImageIcon from '@mui/icons-material/Image';
 import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
+import FormatBoldIcon from '@mui/icons-material/FormatBold';
+import FormatItalicIcon from '@mui/icons-material/FormatItalic';
+
 type Props = {
     value: string,
     onchange: (v: string) => void
@@ -32,7 +35,6 @@ const decorator = new CompositeDecorator([
 const TextArea = ({ value, onchange }: Props) => {
 
     const [_outPut, set_outPut] = useState<string>("")
-    const [_type, set_type] = useState<string>("")
     const [_editorState, set_EditorState] = useState(EditorState.createEmpty(decorator));
 
     useEffect(() => {
@@ -66,9 +68,10 @@ const TextArea = ({ value, onchange }: Props) => {
 
     const createBlockStyle = (value: EditorState, type: string) => {
         set_EditorState(RichUtils.toggleBlockType(value, type));
-        set_type(_type => _type === type ? "" : type)
     }
-
+    const createInlineStyle = (value: any, type: string) => {
+        set_EditorState(RichUtils.toggleInlineStyle(value, type));
+    }
     const createImage = async (value: EditorState) => {
         const selection = value.getSelection();
         const content = value.getCurrentContent();
@@ -84,67 +87,14 @@ const TextArea = ({ value, onchange }: Props) => {
 
     const makeTextRight = async (value: EditorState) => {
         set_EditorState(RichUtils.toggleBlockType(value, 'text-right'));
-        set_type(type => type !== 'text-right' ? 'text-right' : "")
     }
     const makeTextCenter = async (value: EditorState) => {
         set_EditorState(RichUtils.toggleBlockType(value, 'text-center'));
-        set_type(type => type !== 'text-center' ? "text-center" : "")
     }
 
     const editRef: any = useRef("")
 
-    const tool = [
-        {
-            name: "h1",
-            func: () => createBlockStyle(_editorState, "header-one"),
-            type: "header-one",
-        },
-        {
-            name: "h2",
-            func: () => createBlockStyle(_editorState, "header-two"),
-            type: "header-two",
-        },
-        {
-            name: "h3",
-            func: () => createBlockStyle(_editorState, "header-three"),
-            type: "header-three",
-        },
-        {
-            name: "h4",
-            func: () => createBlockStyle(_editorState, "header-four"),
-            type: "header-four",
-        },
-        {
-            name: "h5",
-            func: () => createBlockStyle(_editorState, "header-five"),
-            type: "header-five",
-        },
-        {
-            name: "p",
-            func: () => createBlockStyle(_editorState, "paragraph"),
-            type: "paragraph",
-        },
-        {
-            name: "</>",
-            func: () => createBlockStyle(_editorState, "code-block"),
-            type: "code-block",
-        },
-        {
-            name: <ImageIcon className='h-full m-auto' />,
-            func: () => createImage(_editorState),
-        },
-        {
-            name: <FormatAlignCenterIcon className='h-full m-auto' />,
-            func: () => makeTextCenter(_editorState),
-            type: "text-center",
-        },
-        {
-            name: <FormatAlignRightIcon className='h-full m-auto' />,
-            func: () => makeTextRight(_editorState),
-            type: "text-right",
-        },
-    ]
-    function myBlockStyleFn(contentBlock: { getType: () => any; }) {
+    function myBlockStyleFn(contentBlock: { getType: () => string; }) {
         const type = contentBlock.getType();
         if (type === 'text-center') {
             return 'text-center';
@@ -154,16 +104,84 @@ const TextArea = ({ value, onchange }: Props) => {
         }
         return '';
     }
+    const getCurrentBlockType = (editorState: EditorState) => {
+        const selection = editorState.getSelection();
+        const content = editorState.getCurrentContent();
+        const block = content.getBlockForKey(selection.getStartKey());
+        return block.getType(); // Trả về kiểu như 'unstyled', 'header-one', 'blockquote', v.v.
+    };
+    const sx = `!h-full !w-full m-auto p-2 font-bold flex flex-col justify-center text-center`
+
+    const tool = [
+        {
+            name: <div className={`${sx} ${getCurrentBlockType(_editorState) === "header-one" ? "bg-sky-500 text-white" : "bg-white"}`}>{`h1`}</div>,
+            func: () => createBlockStyle(_editorState, "header-one"),
+            type: "header-one",
+        },
+        {
+            name: <div className={`${sx} ${getCurrentBlockType(_editorState) === "header-two" ? "bg-sky-500 text-white" : "bg-white"}`}>{`h2`}</div>,
+            func: () => createBlockStyle(_editorState, "header-two"),
+            type: "header-two",
+        },
+        {
+            name: <div className={`${sx} ${getCurrentBlockType(_editorState) === "header-three" ? "bg-sky-500 text-white" : "bg-white"}`}>{`h3`}</div>,
+            func: () => createBlockStyle(_editorState, "header-three"),
+            type: "header-three",
+        },
+        {
+            name: <div className={`${sx} ${getCurrentBlockType(_editorState) === "header-four" ? "bg-sky-500 text-white" : "bg-white"}`}>{`h4`}</div>,
+            func: () => createBlockStyle(_editorState, "header-four"),
+            type: "header-four",
+        },
+
+        {
+            name: <div className={`${sx} ${getCurrentBlockType(_editorState) === "header-five" ? "bg-sky-500 text-white" : "bg-white"}`}>{`h5`}</div>,
+            func: () => createBlockStyle(_editorState, "header-five"),
+            type: "header-five",
+        },
+        {
+            name: <div className={`${sx} ${getCurrentBlockType(_editorState) === "code-block" ? "bg-sky-500 text-white" : "bg-white"}`}>{`</>`}</div>,
+            func: () => createBlockStyle(_editorState, "code-block"),
+            type: "code-block",
+        },
+        {
+            name: <FormatBoldIcon className={`!h-full !w-full m-auto p-2 ${_editorState.getCurrentInlineStyle().has("BOLD") ? "bg-sky-600 text-white" : "bg-white"}`} />,
+            func: () => createInlineStyle(_editorState, "BOLD"),
+            type: "BOLD",
+        },
+        {
+            name: <FormatItalicIcon className={`!h-full !w-full m-auto p-2 ${_editorState.getCurrentInlineStyle().has("ITALIC") ? "bg-sky-600 text-white" : "bg-white"}`} />,
+            func: () => createInlineStyle(_editorState, "ITALIC"),
+            type: "ITALIC",
+        },
+        {
+            name: <ImageIcon className={`${sx} bg-white`} />,
+            func: () => createImage(_editorState),
+        },
+        {
+            name: <FormatAlignCenterIcon className={`${sx} ${getCurrentBlockType(_editorState) === "text-center" ? "bg-sky-500 text-white" : "bg-white"}`} />,
+            func: () => makeTextCenter(_editorState),
+            type: "text-center",
+        },
+        {
+            name: <FormatAlignRightIcon className={`${sx} ${getCurrentBlockType(_editorState) === "text-right" ? "bg-sky-500 text-white" : "bg-white"}`} />,
+            func: () => makeTextRight(_editorState),
+            type: "text-right",
+        },
+    ]
+
     return (
         <div className=' rounded'>
-            <div className='sticky top-0 h-12 py-1 flex gap-1 z-[1]'>
+            <div className='sticky top-0 py-1 flex gap-1 z-[1] flex-wrap'>
                 {
                     tool.map((tl, index) =>
-                        <div key={index} className={`h-full aspect-square flex flex-col justify-center text-center border border-slate-300  rounded text-sm cursor-pointer ${_type === tl.type ? "bg-sky-600 text-white" : "bg-white"} `} onClick={tl.func}>{tl.name}</div>
+                        <div key={index}
+                            className={`h-10 aspect-square overflow-hidden shadow rounded`}
+                            onClick={tl.func}>{tl.name}</div>
                     )
                 }
             </div>
-            <div className='dangerous_box border bg-white border-slate-300 min-h-96 p-4 overflow-x-auto scroll_none cursor-text' onClick={() => editRef.current.focus()}>
+            <div className='dangerous_box border bg-white border-slate-300 min-h-96 p-4 overflow-x-auto scroll_none cursor-text text-justify text-sm md:text-base' onClick={() => editRef.current.focus()}>
                 <Editor ref={editRef} editorState={_editorState} onChange={(editorState) => set_EditorState(editorState)} blockStyleFn={myBlockStyleFn} />
             </div>
         </div>
@@ -171,3 +189,4 @@ const TextArea = ({ value, onchange }: Props) => {
 }
 
 export default TextArea
+

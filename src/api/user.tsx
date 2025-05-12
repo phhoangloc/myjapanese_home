@@ -29,7 +29,7 @@ export const ApiCheckLogin = async () => {
 
 }
 export const ApiLogout = async ({ position }: BodyTypeWithPosition) => {
-    const result = await axios.post(process.env.api_url + "api/" + position + "/logout", {
+    const result = await axios.post(process.env.api_url + "api/" + position + "/logout", {}, {
         withCredentials: true
     })
     return result.data
