@@ -4,7 +4,8 @@ import axios from "axios"
 export type BodyTypeWithPosition = {
     position: string,
     archive?: string,
-    archivePlus?: string,
+    part?: string,
+    mondai?: string,
     id?: number,
     slug?: string,
     hostId?: string,
@@ -35,11 +36,12 @@ export const ApiLogout = async ({ position }: BodyTypeWithPosition) => {
     return result.data
 }
 
-export const ApiItemUser = async ({ position, archive, archivePlus, hostId, search, id, slug, sort, skip, limit }: BodyTypeWithPosition) => {
+export const ApiItemUser = async ({ position, archive, part, mondai, hostId, search, id, slug, sort, skip, limit }: BodyTypeWithPosition) => {
     try {
         const result = await axios.get(process.env.api_url + "api/" + position +
             "/" + archive +
-            "?archive=" + `${archivePlus ? archivePlus : archive}` +
+            "?part=" + `${part ? part : ""}` +
+            "&mondai=" + `${mondai ? mondai : ""}` +
             "&hostId=" + `${hostId ? hostId : ""}` +
             "&search=" + `${search ? search : ""}` +
             "&id=" + `${id ? id : ""}` +

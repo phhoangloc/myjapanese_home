@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import { useParams } from 'next/navigation'
-import { DetailBlog, DetailUser } from '@/components/admin/detail'
+import { Detail, DetailBlog, DetailUser } from '@/components/admin/detail'
 const Page = () => {
     const params = useParams<{ archive: string, slug: string }>()
     const archive = params.archive
@@ -12,6 +12,8 @@ const Page = () => {
             return <DetailBlog archive='blog' slug={slug} />
         case "user":
             return <DetailUser archive='user' slug={slug} />
+        case "exercise":
+            return <Detail archive='exercise' slug={slug} />
         default:
             return (
                 <div>

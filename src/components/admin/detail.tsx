@@ -2,14 +2,20 @@
 import { ApiItem } from '@/api/client'
 import React, { useEffect, useState } from 'react'
 import AddIcon from '@mui/icons-material/Add';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '../input/input';
 import TextArea from '../input/textarea';
 import { Button } from '../button/button';
 import { ApiCreateItem, ApiItemUser, ApiUpdateItem } from '@/api/user';
 import { UserType } from '@/redux/reducer/UserReduce';
 import store from '@/redux/store';
-type props = {
+import { DividerSelect } from '../input/divider';
+import Add from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import moment from 'moment';
+import ModalCard from '../card/modalCard';
+
+type Props = {
     archive: string,
     slug: string
 }
@@ -23,7 +29,7 @@ type ItemType = {
     position: string,
     email: string,
 }
-export const DetailBlog = ({ archive, slug }: props) => {
+export const DetailBlog = ({ archive, slug }: Props) => {
 
     const [_currentUser, set_currentUser] = useState<UserType>(store.getState().user)
 
@@ -109,7 +115,7 @@ export const DetailBlog = ({ archive, slug }: props) => {
         </div>
     )
 }
-export const DetailUser = ({ archive, slug }: props) => {
+export const DetailUser = ({ archive, slug }: Props) => {
     const [_currentUser, set_currentUser] = useState<UserType>(store.getState().user)
 
     const update = () => {
@@ -193,4 +199,227 @@ export const DetailUser = ({ archive, slug }: props) => {
                 </div>
             </div>
     )
+}
+type questionTypeBody = {
+    archive: string;
+    part: string;
+    mondai: string;
+    question?: string;
+    choose?: string;
+    answer?: string;
+    questionTran?: string;
+    answerTran?: string;
+    explain?: string;
+    exam?: string;
+}
+
+type ExamType = {
+    exam: {
+        id: number
+        createdAt: Date
+    },
+    exer: {
+        id: number
+    }
+}
+export const Detail = ({ archive, slug }: Props) => {
+
+    const searchParams = useSearchParams()
+    const part = searchParams.get("part") || ""
+
+    const [_currentUser, set_currentUser] = useState<UserType>(store.getState().user)
+    const update = () => {
+        store.subscribe(() => set_currentUser(store.getState().user))
+    }
+    useEffect(() => {
+        update()
+    }, [])
+
+    const [_loading, set_loading] = useState<boolean>(true)
+    const [_id, set_id] = useState<number>(0)
+    const [_exams, set_exams] = useState<ExamType[]>([])
+    const [_isExamsOpen, set_isExamsOpen] = useState<boolean>(false)
+    const [_part, set_part] = useState<string>(part)
+    const [_mondai, set_mondai] = useState<string>("")
+    const [_question, set_question] = useState<string>("")
+    const [__question, set__question] = useState<string>("")
+    const [_choose, set_choose] = useState<string>("")
+    const [_explain, set_explain] = useState<string>("")
+    const [__explain, set__explain] = useState<string>("")
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [_chooseArr, set_chooseArr] = useState<any[]>([])
+
+    const [_chooseIndex, set_chooseIndex] = useState<number>(-1)
+    const [_chooseQuestion, set_chooseQuestion] = useState<string>("")
+    const [_answerA, set_answerA] = useState<string>("")
+    const [_answerB, set_answerB] = useState<string>("")
+    const [_answerC, set_answerC] = useState<string>("")
+    const [_answerD, set_answerD] = useState<string>("")
+    const [_chooseAnswer, set_chooseAnswer] = useState<string>("")
+
+    const getItem = async (position: string, archive: string, part: string, id: string) => {
+        set_loading(true)
+        const result = await ApiItemUser({ position, archive, part, id: Number(id) })
+        console.log(result)
+        if (result.success && result.data[0]) {
+            set_loading(false)
+            set_id(result.data[0].id)
+            set_exams(result.data[0].exam)
+            set_mondai(result.data[0].mondai)
+            set_question(result.data[0].question)
+            set_chooseArr(JSON.parse(result.data[0].choose))
+            set_choose(result.data[0].choose)
+            set_explain(result.data[0].explain)
+        } else {
+            set_loading(false)
+        }
+    }
+
+    useEffect(() => {
+        getItem(_currentUser.position, archive, part, slug !== "_news" ? slug : "-1")
+    }, [archive, slug, _currentUser.position, part])
+
+    const toPage = useRouter()
+
+    const body: questionTypeBody = {
+        archive: archive,
+        part: part,
+        mondai: _mondai,
+        question: __question,
+        choose: _choose,
+        explain: __explain
+    }
+
+    const upload = async (position: string, archive: string, id: number, body: questionTypeBody,) => {
+        const result = await ApiUpdateItem({ position, archive, id }, body)
+        if (result.success) {
+            toPage.push("/admin/" + body.archive + "?part=" + body.part)
+        }
+    }
+    const create = async (position: string, archive: string, body: questionTypeBody,) => {
+        const result = await ApiCreateItem({ position, archive }, body)
+        if (result.success) {
+            toPage.push("/admin/" + body.archive + "?part=" + body.part)
+        }
+    }
+
+    const makeQuestion = (index: number) => {
+        set_chooseArr((arr) => [...arr, {
+            id: (index),
+            name: "question " + Number(_chooseArr.length + 1),
+            question: "",
+            answerA: "",
+            answerB: "",
+            answerC: "",
+            answerD: "",
+            answer: ""
+        }])
+    }
+
+
+    const inputItem = (t: "id" | "question" | "answerA" | "answerB" | "answerC" | "answerD" | "name" | "answer", v: string, index: number) => {
+        const newArr = _chooseArr
+        const object: Record<string, string | number> = newArr[index]
+        const prop: keyof typeof object = t;
+        object[prop] = v
+        set_chooseArr(newArr)
+    }
+
+    const deleteQuestion = (index: number) => {
+        const newArr = _chooseArr
+        const newArrFilter = newArr.filter((a, i) => i !== index)
+        set_chooseArr(newArrFilter)
+        set_chooseIndex(-1)
+    }
+
+    useEffect(() => {
+        set_choose(JSON.stringify(_chooseArr))
+    }, [_chooseAnswer, _answerA, _answerB, _answerC, _answerD, _chooseQuestion, _chooseArr])
+
+    useEffect(() => {
+        if (_chooseArr.length) {
+            set_chooseIndex(_chooseArr.length - 1)
+        }
+    }, [_chooseArr.length])
+
+    useEffect(() => {
+        if (part) {
+            set_part(part)
+        }
+    }, [part])
+
+    return (
+        _loading ?
+            < div className="h-11  bg-white px-2 shadow-md rounded flex flex-col justify-center gap-1 text-center " >
+                loading...
+            </div> :
+            <div className='flex flex-col gap-1'>
+                <div className="h-11  bg-white px-2 shadow-md rounded cursor-pointer" onClick={() => toPage.push("/" + archive + "/-1")}>
+                    <div className="flex">
+                        <AddIcon className='!w-11 !h-11 p-2' />
+                        <div className='flex flex-col justify-center'>new question of {archive}</div>
+                    </div>
+                </div>
+                < div className="min-h-full  bg-white px-2 shadow-md rounded  flex flex-col gap-1 " >
+                    <div className="h-11 flex flex-col justify-end font-bold">Part</div>
+                    <DividerSelect data={[{ id: 0, name: "chisiki" }, { id: 1, name: "dokkai" }, { id: 2, name: "chokai" }]} name={_part} valueReturn={(v) => set_part(v.name)} key={_chooseArr.length} />
+                    <div className="h-11 flex flex-col justify-end font-bold">Mondai</div>
+                    <Input onchange={(v) => set_mondai(v)} value={_mondai} />
+
+                    <div className="h-11 flex flex-col justify-end font-bold">Reading</div>
+                    <TextArea onchange={(v) => set__question(v)} value={_question} />
+
+                    <div className="h-11 flex flex-col justify-end font-bold">Q&A</div>
+                    <div className="flex">
+                        <DividerSelect data={_chooseArr} name={"question " + Number(_chooseIndex + 1)} valueReturn={(v) => set_chooseIndex(v.id)} key={_chooseArr.length} />
+                        <Add className='!h-12 !w-12 p-3' onClick={() => { makeQuestion(_chooseArr[_chooseArr.length - 1] ? _chooseArr[_chooseArr.length - 1].id + 1 : 0) }} />
+                        {_chooseIndex !== -1 ? <RemoveIcon className='!h-12 !w-12 p-3' onClick={() => deleteQuestion(_chooseIndex)} /> : null}
+                    </div>
+
+                    {
+                        _chooseIndex !== -1 ?
+                            < div >
+                                <p>question {_chooseIndex + 1}</p>
+                                <Input onchange={(v) => { inputItem("question", v, _chooseIndex); set_chooseQuestion(v) }} value={_chooseArr[_chooseIndex].question} key={"q" + _chooseIndex} />
+                                <p>Answer A</p>
+                                <Input onchange={(v) => { inputItem("answerA", v, _chooseIndex); set_answerA(v) }} value={_chooseArr[_chooseIndex].answerA} key={"aa" + _chooseIndex} />
+                                <p>Answer B</p>
+                                <Input onchange={(v) => { inputItem("answerB", v, _chooseIndex); set_answerB(v) }} value={_chooseArr[_chooseIndex].answerB} key={"ab" + _chooseIndex} />
+                                <p>Answer C</p>
+                                <Input onchange={(v) => { inputItem("answerC", v, _chooseIndex); set_answerC(v) }} value={_chooseArr[_chooseIndex].answerC} key={"ac" + _chooseIndex} />
+                                <p>Answer D</p>
+                                <Input onchange={(v) => { inputItem("answerD", v, _chooseIndex); set_answerD(v) }} value={_chooseArr[_chooseIndex].answerD} key={"ad" + _chooseIndex} />
+                                <DividerSelect data={[{ name: "A" }, { name: "B" }, { name: "C" }, { name: "D" },]} name={_chooseArr[_chooseIndex].answer || "answer correct"} valueReturn={(v) => { inputItem("answer", v.name ? v.name : _chooseArr[_chooseIndex].answer, _chooseIndex); set_chooseAnswer(v.name ? v.name : _chooseArr[_chooseIndex].answer) }} key={"a" + _chooseIndex} />
+                            </div> :
+                            null
+                    }
+                    <div className="h-11 flex flex-col justify-end font-bold">Explain</div>
+
+                    <TextArea onchange={(v) => set__explain(v)} value={_explain} />
+                    <div className="h-11  font-bold flex">
+                        <div className='flex flex-col justify-end'>In Exam</div>
+                        <AddIcon className='!w-6 !h-6 mt-auto mb-1 mx-2 cursor-pointer' onClick={() => set_isExamsOpen(!_isExamsOpen)} />
+                    </div>
+                    <div className={`overflow-y-scroll h-60 border border-slate-300 ${_isExamsOpen ? "block" : "hidden"}`}>
+                        <ModalCard archive='exam' sendout={(v) => console.log(v)} />
+                    </div>
+                    <div className='h-max border border-slate-300 even:bg-slate-50'>
+                        {
+                            _exams.map((exam, index) =>
+                                <div key={index} className='h-12 flex justify-between px-2'>
+                                    <div className='flex flex-col justify-center'>{moment(exam.exam.createdAt).format("YYYY年MM月DD日")}</div>
+                                    <RemoveIcon className='!w-12 !h-12 p-2' />
+                                </div>)
+                        }
+                    </div>
+
+
+                    <Button name={_id && _id !== -1 ? "save" : "create"} sx='bg-slate-200 !text-black' onClick={() => _id && _id !== -1 ? upload(_currentUser.position, archive, _id, body) : create(_currentUser.position, archive, body)}></Button>
+                </div >
+            </div >
+
+
+    )
+
 }

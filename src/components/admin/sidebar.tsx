@@ -15,27 +15,42 @@ const Sidebar = () => {
     const listMenu = [
         {
             icon: <HomeIcon className='!w-12 !h-12 p-2' />,
-            name: "Home",
+            name: "ホーム",
             link: "/",
         },
         {
             icon: <div className='!w-12 !h-12 p-2 flex flex-col justify-center text-center font-bold text-xl'>B</div>,
-            name: "blog",
+            name: "ブログ",
             link: "/admin/blog",
         },
         {
-            icon: <div className='!w-12 !h-12 p-2 flex flex-col justify-center text-center font-bold text-xl'>E</div>,
-            name: "exercise",
-            link: "/admin/exercise",
+            icon: <div className='!w-12 !h-12 p-2 flex flex-col justify-center text-center font-bold text-xl'>知</div>,
+            name: "言語知識",
+            link: "/admin/exercise?part=chisiki",
+        },
+        {
+            icon: <div className='!w-12 !h-12 p-2 flex flex-col justify-center text-center font-bold text-xl'>読</div>,
+            name: "読解",
+            link: "/admin/exercise?part=dokkai",
+        },
+        {
+            icon: <div className='!w-12 !h-12 p-2 flex flex-col justify-center text-center font-bold text-xl'>聴</div>,
+            name: "聴解",
+            link: "/admin/exercise?part=chokai",
+        },
+        {
+            icon: <div className='!w-12 !h-12 p-2 flex flex-col justify-center text-center font-bold text-xl'>試</div>,
+            name: "試験問題",
+            link: "/admin/exam",
         },
         {
             icon: <div className='!w-12 !h-12 p-2 flex flex-col justify-center text-center font-bold text-xl'>U</div>,
-            name: "user",
+            name: "ユーザー",
             link: "/admin/user",
         },
         {
             icon: <div className='!w-12 !h-12 p-2 flex flex-col justify-center text-center font-bold text-xl'>F</div>,
-            name: "file",
+            name: "ファイル",
             link: "/admin/file",
         },
     ]
@@ -87,7 +102,7 @@ const Sidebar = () => {
                         <LogoutIcon className='!w-12 !h-12 p-2' />
                     </div>
                     <div className="flex flex-col justify-center uppercase ">
-                        log out
+                        ログアウト
                     </div>
                 </div>
             </div>

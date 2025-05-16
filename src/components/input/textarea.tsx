@@ -8,7 +8,8 @@ import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
 import FormatItalicIcon from '@mui/icons-material/FormatItalic';
-
+import PlaylistAddCircleIcon from '@mui/icons-material/PlaylistAddCircle';
+import ModalCard from '../card/modalCard';
 type Props = {
     value: string,
     onchange: (v: string) => void
@@ -17,6 +18,10 @@ const Image = (props: any) => {
     const { src } = props.contentState.getEntity(props.entityKey).getData();
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={src} alt="" className='w-full' />;
+};
+const Audio = (props: any) => {
+    const { src } = props.contentState.getEntity(props.entityKey).getData();
+    return <audio controls src={src} className='w-full' />;
 };
 const decorator = new CompositeDecorator([
     {
@@ -30,12 +35,25 @@ const decorator = new CompositeDecorator([
         },
         component: Image,
     },
+    {
+        strategy: (contentBlock, callback, contentState) => {
+            contentBlock.findEntityRanges((character) => {
+                const entityKey = character.getEntity();
+                return (
+                    entityKey !== null && contentState.getEntity(entityKey).getType() === 'AUDIO'
+                );
+            }, callback);
+        },
+        component: Audio,
+    }
 ]);
 
 const TextArea = ({ value, onchange }: Props) => {
 
     const [_outPut, set_outPut] = useState<string>("")
     const [_editorState, set_EditorState] = useState(EditorState.createEmpty(decorator));
+    const [_isGetPic, set_isGetPic] = useState<boolean>(false)
+    const [_isGetAudio, set_isGetAudio] = useState<boolean>(false)
 
     useEffect(() => {
         const _stateContent = stateFromHTML(value)
@@ -72,19 +90,20 @@ const TextArea = ({ value, onchange }: Props) => {
     const createInlineStyle = (value: any, type: string) => {
         set_EditorState(RichUtils.toggleInlineStyle(value, type));
     }
-    const createImage = async (value: EditorState) => {
-        const selection = value.getSelection();
-        const content = value.getCurrentContent();
-        const startOffset = selection.getStartOffset();
-        const endOffset = selection.getEndOffset();
-        const block = content.getBlockForKey(selection.getStartKey());
-        const text = block.getText()
-        const contentStateWithEntity = content.createEntity('IMAGE', 'MUTABLE', { src: text.slice(startOffset, endOffset) });
+    const createImage = async (url: string) => {
+        const content = _editorState.getCurrentContent();
+        const contentStateWithEntity = content.createEntity('IMAGE', 'MUTABLE', { src: url });
         const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-        const newEditorState = AtomicBlockUtils.insertAtomicBlock(value, entityKey, ' ');
+        const newEditorState = AtomicBlockUtils.insertAtomicBlock(_editorState, entityKey, ' ');
         set_EditorState(newEditorState);
     }
-
+    const addAudio = async (url: string) => {
+        const content = _editorState.getCurrentContent();
+        const contentStateWithEntity = content.createEntity('AUDIO', 'MUTABLE', { src: url });
+        const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+        const newEditorState = AtomicBlockUtils.insertAtomicBlock(_editorState, entityKey, ' ');
+        set_EditorState(newEditorState);
+    }
     const makeTextRight = async (value: EditorState) => {
         set_EditorState(RichUtils.toggleBlockType(value, 'text-right'));
     }
@@ -155,8 +174,12 @@ const TextArea = ({ value, onchange }: Props) => {
             type: "ITALIC",
         },
         {
-            name: <ImageIcon className={`${sx} bg-white`} />,
-            func: () => createImage(_editorState),
+            name: <ImageIcon className={`${sx} bg-white cursor-pointer`} />,
+            func: () => set_isGetPic(true),
+        },
+        {
+            name: <PlaylistAddCircleIcon className={`${sx} bg-white cursor-pointer`} />,
+            func: () => set_isGetAudio(true),
         },
         {
             name: <FormatAlignCenterIcon className={`${sx} ${getCurrentBlockType(_editorState) === "text-center" ? "bg-sky-500 text-white" : "bg-white"}`} />,
@@ -170,6 +193,17 @@ const TextArea = ({ value, onchange }: Props) => {
         },
     ]
 
+    const getUrl = (url: string) => {
+        if (_isGetPic) {
+            createImage(url)
+        }
+        if (_isGetAudio) {
+            addAudio(url)
+        }
+
+        set_isGetAudio(false)
+        set_isGetPic(false)
+    }
     return (
         <div className=' rounded'>
             <div className='sticky top-0 py-1 flex gap-1 z-[1] flex-wrap'>
@@ -180,6 +214,9 @@ const TextArea = ({ value, onchange }: Props) => {
                             onClick={tl.func}>{tl.name}</div>
                     )
                 }
+            </div>
+            <div className={`w-full overflow-hidden transition-all duration-200 ${_isGetPic || _isGetAudio ? "h-max" : "h-0"}`}>
+                <ModalCard archive='file' sendout={(url) => getUrl(url)} />
             </div>
             <div className='dangerous_box border bg-white border-slate-300 min-h-96 p-4 overflow-x-auto scroll_none cursor-text text-justify text-sm md:text-base' onClick={() => editRef.current.focus()}>
                 <Editor ref={editRef} editorState={_editorState} onChange={(editorState) => set_EditorState(editorState)} blockStyleFn={myBlockStyleFn} />

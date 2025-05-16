@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
   },
   env: {
     api_url: "http://localhost:4000/",
-    ftp_url: "https://image.buoncf.jp/myenglish/",
+    ftp_url: "https://image.buoncf.jp/myjapanese/",
   }
 };
 
