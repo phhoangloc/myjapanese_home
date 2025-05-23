@@ -4,6 +4,7 @@ import "../style/plus.css";
 
 import { Nunito_Sans } from 'next/font/google'
 import Provider from "@/redux/component/provider";
+import Modal from "@/components/modal/modal";
 
 const font = Nunito_Sans({
   subsets: ['latin'],
@@ -25,6 +26,7 @@ export default function RootLayout({
         className={`${font.className} bg-slate-100`}
       >
         <Provider>
+          <Modal />
           {children}
         </Provider>
       </body>

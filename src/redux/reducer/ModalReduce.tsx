@@ -3,7 +3,9 @@ import { createSlice } from "@reduxjs/toolkit"
 import { PayloadAction } from "@reduxjs/toolkit"
 
 export type ModalType = {
+    type: string,
     open: boolean,
+    msg: string,
     value: string,
 
 }

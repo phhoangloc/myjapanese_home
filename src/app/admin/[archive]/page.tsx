@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import { useParams } from 'next/navigation'
-import { Archive, ArchiveBlog, ArchiveExam, ArchiveFile } from '@/components/admin/archive'
+import { Archive, ArchiveBlog, ArchiveExam, ArchiveFile, ArchiveUser } from '@/components/admin/archive'
 const Page = () => {
     const params = useParams<{ archive: string }>()
     const archive = params.archive
@@ -20,6 +20,10 @@ const Page = () => {
         case "exam":
             return (
                 <ArchiveExam archive={archive} />
+            )
+        case "user":
+            return (
+                <ArchiveUser archive={archive} />
             )
         default:
             return (

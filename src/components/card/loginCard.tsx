@@ -6,6 +6,7 @@ import { ApiLogin } from '@/api/client'
 import store from '@/redux/store'
 import { setRefresh } from '@/redux/reducer/RefreshReduce'
 import { useRouter } from 'next/navigation'
+import { setModal } from '@/redux/reducer/ModalReduce'
 
 const LoginCard = () => {
 
@@ -18,11 +19,11 @@ const LoginCard = () => {
     const login = async (data: { username: string, password: string }) => {
         const result = await ApiLogin(data)
         if (result.success) {
-            // store.dispatch(setNotice({ success: result.success, msg: result.msg, open: true }))
+            store.dispatch(setModal({ open: true, type: "notification", msg: "ログイン成功", value: "" }))
             setTimeout(() => {
-                // store.dispatch(setNotice({ success: result.success, msg: "", open: false }))
-                toPage.refresh()
+                store.dispatch(setModal({ open: false, type: "", msg: "", value: "" }))
                 store.dispatch(setRefresh())
+                toPage.refresh()
             }, 3000)
         }
     }

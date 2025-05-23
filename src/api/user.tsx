@@ -14,7 +14,8 @@ export type BodyTypeWithPosition = {
     limit?: number,
     sort?: string,
     update?: number,
-    file?: File
+    file?: File,
+    examinee?: number
 }
 export const ApiCheckLogin = async () => {
     try {
@@ -36,7 +37,7 @@ export const ApiLogout = async ({ position }: BodyTypeWithPosition) => {
     return result.data
 }
 
-export const ApiItemUser = async ({ position, archive, part, mondai, hostId, search, id, slug, sort, skip, limit }: BodyTypeWithPosition) => {
+export const ApiItemUser = async ({ position, archive, part, mondai, hostId, search, id, slug, sort, skip, limit, examinee }: BodyTypeWithPosition) => {
     try {
         const result = await axios.get(process.env.api_url + "api/" + position +
             "/" + archive +
@@ -48,7 +49,8 @@ export const ApiItemUser = async ({ position, archive, part, mondai, hostId, sea
             "&slug=" + `${slug ? slug : ""}` +
             "&skip=" + `${skip ? skip : ""}` +
             "&sort=" + `${sort ? sort : ""}` +
-            "&limit=" + `${limit ? limit : ""}`,
+            "&limit=" + `${limit ? limit : ""}` +
+            "&examinee=" + `${examinee ? examinee : ""}`,
             {
                 headers: {
                     'Content-Type': 'application/json',

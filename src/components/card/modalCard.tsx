@@ -7,11 +7,13 @@ import Image from 'next/image'
 import AddIcon from '@mui/icons-material/Add';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import moment from 'moment'
-
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 type Props = {
     archive: string,
     array?: { id: number }[]
     sendout: (url: string) => void,
+    sendArray?: (arr: { id: number }[]) => void,
 }
 type ItemType = {
     id: number,
@@ -19,7 +21,7 @@ type ItemType = {
     type: string,
     createdAt: Date
 }
-export const ModalCard = ({ archive, sendout, array }: Props) => {
+export const ModalCard = ({ archive, sendout, array, sendArray }: Props) => {
 
     const [_currentUser, set_currentUser] = useState<UserType>(store.getState().user)
 
@@ -66,6 +68,17 @@ export const ModalCard = ({ archive, sendout, array }: Props) => {
 
     }
 
+    const [_array, set_array] = useState<{ id: number }[]>([])
+    // const [_NewArray, set_newArray] = useState<{ id: number }[]>([])
+    const [_k, set_k] = useState<number>(0)
+
+    useEffect(() => {
+        if (array && array.length) {
+            set_array(array)
+        }
+    }, [array])
+
+
     switch (archive) {
         case "file":
             return (
@@ -94,7 +107,31 @@ export const ModalCard = ({ archive, sendout, array }: Props) => {
             return (
                 _items.map((exam, index) =>
                     <div key={index} className='h-12 flex px-2 border-b border-slate-200'>
-                        <input type='checkbox' className='w-4 h-4 my-auto mr-2' checked={array?.includes(exam)} />
+                        {
+                            _array?.some(obj => obj.id === exam.id) ?
+                                <CheckBoxOutlinedIcon className='!w-12 !h-12 p-2 cursor-pointer text-sky-600  ' key={_k}
+                                    onClick={() => {
+                                        const new_array = _array
+                                        new_array.splice(index, 1)
+                                        if (sendArray) {
+                                            sendArray(new_array)
+                                        }
+                                        set_k(k => k + 1)
+                                    }
+
+                                    } /> :
+                                <CheckBoxOutlineBlankIcon className='!w-12 !h-12 p-2 cursor-pointer  ' key={_k}
+                                    onClick={() => {
+                                        const new_array = _array
+                                        new_array[index] = { id: exam.id }
+                                        if (sendArray) {
+                                            sendArray(new_array)
+                                        }
+                                        set_k(k => k + 1)
+                                    }
+
+                                    } />
+                        }
                         <div className='flex flex-col justify-center'>{moment(exam.createdAt).format("YYYY年MM月DD日")}</div>
                     </div>)
 

@@ -32,7 +32,7 @@ export const DividerSelect = ({ data, name, sx, valueReturn }: Props) => {
         }
     }, [_id, _name, valueReturn])
     return (
-        <div className={`relative h-full  ${sx}`}>
+        <div className={`relative h-12  ${sx}`}>
             <Divider name={
                 <div className='flex justify-between'>
                     <div className='flex flex-col justify-center'>{valueReturn && _name || name}</div>
